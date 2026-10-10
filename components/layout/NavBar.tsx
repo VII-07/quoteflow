@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-type NavBarItemsType = {
+type NavItemType = {
   name: string;
   href: string;
-}[];
+};
 
-const NavBarItems: NavBarItemsType = [
+const NavBarItems: NavItemType[] = [
   {
     name: "Dashboard",
     href: "/",
