@@ -24,8 +24,8 @@ export const Header = () => {
       <div className="flex items-center justify-end w-full gap-6">
         <UserSection />
 
-        <Button className="bg-primary font-bold text-md primary-foreground flex items-center cursor-pointer gap-2 px-8 py-5 rounded-lg">
-          <PlusIcon className="font-bold text-primary-foreground" />
+        <Button variant="link" className="font-bold bg-primary text-primary-foreground primary-foreground cursor-pointer gap-2 px-8 py-5 rounded-lg">
+          <PlusIcon className="text-primary-foreground" />
           <span>New estimate</span>
         </Button>
       </div>
