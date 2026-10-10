@@ -12,7 +12,7 @@ export const Header = () => {
         <Link href="/">
           <div className="flex items-center p-4 gap-2">
             <CraneIcon />
-            <span className=" text-secondary-foreground font-bold text-2xl">
+            <span className=" text-primary-foreground font-bold text-2xl">
               QuoteFlow
             </span>
           </div>
@@ -24,8 +24,8 @@ export const Header = () => {
       <div className="flex items-center justify-end w-full gap-6">
         <UserSection />
 
-        <Button className="bg-primary font-bold text-md text-secondary-foreground flex items-center cursor-pointer gap-2 px-8 py-5 rounded-lg">
-          <PlusIcon className="font-bold text-secondary-foreground" />
+        <Button className="bg-primary font-bold text-md primary-foreground flex items-center cursor-pointer gap-2 px-8 py-5 rounded-lg">
+          <PlusIcon className="font-bold text-primary-foreground" />
           <span>New estimate</span>
         </Button>
       </div>
