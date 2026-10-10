@@ -45,12 +45,7 @@ Design tokens live in `app/colors.css`. `@theme inline` maps `--color-*` utiliti
 
 ## App structure
 
-- `app/(dashboard)/` is the main app route group: the dashboard page and the `estimate/` routes (list, `new`, `[id]`).
-- `app/( auth)/login/` is the auth route group. **Note the space in the folder name `( auth)`**, which is probably a typo for `(auth)`.
-- `components/layout/` holds app chrome such as `Header`, `components/shared/` holds reusable pieces such as the logo, and `components/ui/` holds shadcn primitives.
-
-## Known in-progress issues
-
-- `app/page.tsx` and `app/(dashboard)/page.tsx` both resolve to `/`. Next.js reports this as a route conflict. `app/page.tsx` also imports the dashboard layout and page by hand, but route group layouts are applied automatically.
-- The `login` and `estimate` page files are empty. A page needs a default-exported component, or the build fails.
-- `app/layout.tsx` still contains the create-next-app placeholder metadata.
+- `app/(dashboard)/` is the main app route group. Its `layout.tsx` renders `Header` above `<main>`. Routes: `/`, `/quotes` (list, `new`, `[id]`), `/clients`, `/settings`.
+- `app/(auth)/login/` is the auth route group, with no shared layout yet.
+- `components/layout/` holds app chrome: `Header`, `NavBar`, `UserSection`, `Logo`. `components/shared/` holds reusable pieces such as `LogoIcon`, and `components/ui/` holds shadcn primitives.
+- The domain entity is called **quote** (routes and nav). Some UI text still says "estimate".

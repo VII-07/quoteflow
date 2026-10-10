@@ -1,11 +1,11 @@
 import Link from "next/link";
 
-type NavBarItemType = {
+type NavBarItemsType = {
   name: string;
   href: string;
 }[];
 
-const NavBarItems: NavBarItemType = [
+const NavBarItems: NavBarItemsType = [
   {
     name: "Dashboard",
     href: "/",
@@ -30,10 +30,7 @@ export const NavBar = () => {
       <ul className="flex gap-4 p-4">
         {NavBarItems.map((item) => (
           <li key={item.name}>
-            <Link
-              href={item.href}
-              className="text-primary-foreground hover:text-primary"
-            >
+            <Link href={item.href} className="hover:text-primary">
               {item.name}
             </Link>
           </li>

@@ -35,11 +35,12 @@
 }
 
 :root {
- 
   --primary: #168779;
   --secondary: #373737;
   --secondary-foreground: #ffffff;
   --primary-foreground: #ffffff;
+  --background: #ffffff;
+  --foreground: #111111;
 }
 
 .dark {

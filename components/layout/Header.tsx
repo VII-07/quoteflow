@@ -19,13 +19,11 @@ export const Header = () => {
         <Link
           href="/quotes/new"
           className={buttonVariants({
-            variant: "default",
-            size: "default",
-            className: "font-bold cursor-pointer gap-2 px-8 py-5 rounded-lg",
+            className: "font-bold gap-2 px-8 py-5 rounded-lg",
           })}
         >
-            <PlusIcon className="text-primary-foreground" />
-            <span>New estimate</span>
+          <PlusIcon />
+          <span>New quote</span>
         </Link>
       </div>
     </header>
