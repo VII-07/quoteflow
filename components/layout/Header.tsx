@@ -12,7 +12,7 @@ export const Header = () => {
         <Link href="/">
           <div className="flex items-center p-4 gap-2">
             <CraneIcon />
-            <span className=" text-primary-foreground font-bold text-2xl">
+            <span className="font-bold text-2xl">
               QuoteFlow
             </span>
           </div>
