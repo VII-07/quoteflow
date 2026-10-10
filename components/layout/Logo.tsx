@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CraneIcon } from "@/components/shared/Logo/LogoIcon";
-const Logo = () => {
+export const Logo = () => {
   return (
     <Link className="flex items-center p-4 gap-2" href="/">
       <CraneIcon />
@@ -8,5 +8,3 @@ const Logo = () => {
     </Link>
   );
 };
-
-export default Logo;
