@@ -3,7 +3,7 @@ import Link from "next/link";
 import { NavBar } from "@/components/layout/NavBar";
 import { buttonVariants } from "@/components/ui/button";
 import { UserSection } from "./UserSection";
-import Logo from "./Logo";
+import { Logo } from "./Logo";
 
 export const Header = () => {
   return (
