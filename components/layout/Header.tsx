@@ -1,5 +1,4 @@
 import { PlusIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { NavBar } from "@/components/layout/NavBar";
 import { buttonVariants } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import Logo from "./Logo";
 
 export const Header = () => {
   return (
-    <header className="bg-secondary text-secondary-foreground  flex items-center justify-between w-full px-18">
+    <header className="bg-secondary text-secondary-foreground flex items-center justify-between w-full px-18">
       <div className="flex items-center justify-between w-full">
         <Logo />
         <NavBar />
