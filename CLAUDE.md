@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-QuoteFlow is a B2B portfolio app for creating, validating, versioning and exporting construction estimates. Its purpose is to demonstrate solid business logic, reliable data flow and edge-case handling. The git repo and the Next.js app both live in `web/`; the parent `QuoteFlow/` directory only holds an empty `package-lock.json`. A backend in Node.js + Express + PostgreSQL with **raw SQL** is planned but does not exist yet.
+QuoteFlow is a B2B portfolio app for creating, validating, versioning and exporting construction estimates. Its purpose is to demonstrate solid business logic, reliable data flow and edge-case handling. The git repo and the Next.js app both live in `web/`. A backend in Node.js + Express + PostgreSQL with **raw SQL** is planned but does not exist yet.
 
 ## How to work in this repo
 
@@ -29,6 +29,7 @@ Run everything from `web/`:
 - `npm run build` creates the production build and type-checks
 - `npm run lint` runs ESLint 9 flat config (`eslint.config.mjs`, next core-web-vitals + typescript)
 - `npx tsc --noEmit` type-checks without building
+- `npm run format` / `npm run format:check` runs Prettier with `prettier-plugin-tailwindcss`, which sorts classes. `.prettierrc` points the plugin at `app/globals.css` because Tailwind v4 has no JS config.
 
 No test framework is set up yet.
 
