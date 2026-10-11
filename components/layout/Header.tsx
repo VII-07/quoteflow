@@ -7,8 +7,8 @@ import { Logo } from "./Logo";
 
 export const Header = () => {
   return (
-    <header className="flex w-full items-center justify-between bg-secondary px-18 text-secondary-foreground">
-      <div className="flex w-full items-center justify-between">
+    <header className="flex h-16 w-full justify-between bg-secondary px-18 text-secondary-foreground">
+      <div className="flex w-full justify-between">
         <Logo />
         <NavBar />
       </div>
@@ -19,7 +19,7 @@ export const Header = () => {
         <Link
           href="/quotes/new"
           className={buttonVariants({
-            className: "gap-2 rounded-lg px-8 py-5 font-bold",
+            className: "gap-2 rounded-lg px-7 py-4 font-bold",
           })}
         >
           <PlusIcon />

@@ -1,9 +1,9 @@
-type navItemType = {
+export type NavItem = {
   name: string;
   href: string;
 };
 
-export const navBarItems: navItemType[] = [
+export const navBarItems: NavItem[] = [
   {
     name: "Dashboard",
     href: "/",
@@ -21,3 +21,7 @@ export const navBarItems: navItemType[] = [
     href: "/settings",
   },
 ];
+
+export const isActiveNavItem = (currentPath: string, href: string): boolean => {
+  return currentPath.split("/")[1] === href.split("/")[1];
+};
