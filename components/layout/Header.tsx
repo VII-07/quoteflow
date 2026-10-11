@@ -7,19 +7,19 @@ import { Logo } from "./Logo";
 
 export const Header = () => {
   return (
-    <header className="bg-secondary text-secondary-foreground flex items-center justify-between w-full px-18">
-      <div className="flex items-center justify-between w-full">
+    <header className="flex w-full items-center justify-between bg-secondary px-18 text-secondary-foreground">
+      <div className="flex w-full items-center justify-between">
         <Logo />
         <NavBar />
       </div>
 
-      <div className="flex items-center justify-end w-full gap-6">
+      <div className="flex w-full items-center justify-end gap-6">
         <UserSection />
 
         <Link
           href="/quotes/new"
           className={buttonVariants({
-            className: "font-bold gap-2 px-8 py-5 rounded-lg",
+            className: "gap-2 rounded-lg px-8 py-5 font-bold",
           })}
         >
           <PlusIcon />
