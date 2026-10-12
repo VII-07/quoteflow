@@ -22,6 +22,12 @@ export const navBarItems: NavItem[] = [
   },
 ];
 
+export const navFooterItems: NavItem[] = [
+  { name: "Privacy", href: "/privacy" },
+  { name: "Terms", href: "/terms" },
+  { name: "Contact", href: "/privacy" },
+];
+
 export const isActiveNavItem = (currentPath: string, href: string): boolean => {
   return currentPath.split("/")[1] === href.split("/")[1];
 };

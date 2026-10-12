@@ -11,7 +11,8 @@ import Link from "next/link";
 import { UserSection } from "@/components/layout/UserSection";
 
 export const UserDropdownMenu = () => {
-  const handlelogout = () => {
+  const handleLogout = () => {
+    // TODO: implement real logout once backend auth exists
     console.log("logout");
   };
 
@@ -30,7 +31,7 @@ export const UserDropdownMenu = () => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={handlelogout}>
+        <DropdownMenuItem variant="destructive" onClick={handleLogout}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,3 +1,5 @@
+import Container from "@/components/layout/Container";
+import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -5,9 +7,12 @@ type DashboardLayoutProps = {
 
 const DashboardLayout = (props: DashboardLayoutProps) => {
   return (
-    <div>
+    <div className="flex min-h-dvh flex-col">
       <Header />
-      <main>{props.children}</main>
+      <main className="flex-1">
+        <Container>{props.children}</Container>
+      </main>
+      <Footer />
     </div>
   );
 };
