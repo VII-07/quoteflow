@@ -9,7 +9,7 @@ export const UserSection = ({ className, ...props }: UserSectionProps) => {
     <Button
       variant="ghost"
       className={cn(
-        "flex h-auto cursor-pointer items-center gap-2 px-3 py-1 hover:bg-primary-foreground/5 hover:text-primary",
+        "h-auto px-3 py-1 hover:bg-primary-foreground/5 hover:text-primary aria-expanded:bg-primary-foreground/15 aria-expanded:text-primary-foreground",
         className,
       )}
       {...props}

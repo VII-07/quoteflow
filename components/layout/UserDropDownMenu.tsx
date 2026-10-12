@@ -11,19 +11,14 @@ import Link from "next/link";
 import { UserSection } from "@/components/layout/UserSection";
 
 export const UserDropDownMenu = () => {
-  const logOut = () => {
+  const handlelogOut = () => {
     console.log("logout");
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={
-          <UserSection
-            className="aria-expanded:bg-primary-foreground/15 aria-expanded:text-primary-foreground"
-            aria-label="Open acount menu"
-          />
-        }
+        render={<UserSection aria-label="Open account menu" />}
       />
       <DropdownMenuContent>
         <DropdownMenuGroup>
@@ -35,7 +30,7 @@ export const UserDropDownMenu = () => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={logOut}>
+        <DropdownMenuItem variant="destructive" onClick={handlelogOut}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
