@@ -5,7 +5,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { buttonVariants } from "@/components/ui/button";
 import { Logo } from "./Logo";
 import { UserDropdownMenu } from "@/components/layout/UserDropdownMenu";
-import Container from "@/components/layout/Container";
+import { Container } from "@/components/layout/Container";
 
 export const Header = () => {
   return (
