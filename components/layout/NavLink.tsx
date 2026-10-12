@@ -1,14 +1,17 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { isActiveNavItem, type NavItem } from "@/lib/navigation";
-import { NavLinkView } from "@/components/layout/NavLinkView";
+import { isActiveNavItem } from "@/lib/navigation";
+import {
+  NavLinkView,
+  type NavLinkViewProps,
+} from "@/components/layout/NavLinkView";
 
-type NavLinkProps = { item: NavItem };
+type NavLinkProps = Omit<NavLinkViewProps, "isActive">;
 
-export const NavLink = ({ item }: NavLinkProps) => {
+export const NavLink = ({ item, ...rest }: NavLinkProps) => {
   const currentPath = usePathname();
   const isActive = isActiveNavItem(currentPath, item.href);
 
-  return <NavLinkView item={item} isActive={isActive} />;
+  return <NavLinkView item={item} isActive={isActive} {...rest} />;
 };
