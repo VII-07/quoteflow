@@ -3,8 +3,8 @@ import Link from "next/link";
 import { NavBar } from "@/components/layout/NavBar";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { buttonVariants } from "@/components/ui/button";
-import { UserSection } from "./UserSection";
 import { Logo } from "./Logo";
+import { UserDropDownMenu } from "./UserDropDownMenu";
 
 export const Header = () => {
   return (
@@ -20,7 +20,7 @@ export const Header = () => {
       </div>
 
       <div className="ml-auto flex items-center gap-4 lg:gap-6">
-        <UserSection />
+        <UserDropDownMenu />
 
         <Link
           href="/quotes/new"
