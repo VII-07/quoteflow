@@ -1,11 +1,11 @@
 import { Container } from "@/components/layout/Container";
 import { navFooterItems } from "@/lib/navigation";
 import { cacheLife } from "next/cache";
-import Link from "next/link";
+import { FooterLink } from "@/components/layout/FooterLink";
 
 const getYear = async () => {
   "use cache";
-  cacheLife("max");
+  cacheLife("days");
 
   return new Date().getFullYear();
 };
@@ -16,20 +16,15 @@ export const Footer = async () => {
   return (
     <footer>
       <Container>
-        <div className="flex justify-between border-t border-t-sidebar-ring py-4">
+        <div className="flex flex-col items-center gap-3 border-t py-4 text-center sm:flex-row sm:justify-between sm:text-left">
           <p className="text-sm text-muted-foreground">
             © {currentYear} QuoteFlow. All rights reserved.
           </p>
           <nav aria-label="Footer">
-            <ul className="flex gap-4">
+            <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2">
               {navFooterItems.map((item) => (
                 <li key={item.name}>
-                  <Link
-                    className="text-sm text-muted-foreground hover:text-accent-foreground"
-                    href={item.href}
-                  >
-                    {item.name}
-                  </Link>
+                  <FooterLink item={item} />
                 </li>
               ))}
             </ul>

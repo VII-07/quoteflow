@@ -1,6 +1,7 @@
 import { Container } from "@/components/layout/Container";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+
 type DashboardLayoutProps = {
   children: React.ReactNode;
 };
