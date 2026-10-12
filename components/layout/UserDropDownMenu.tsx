@@ -10,8 +10,8 @@ import {
 import Link from "next/link";
 import { UserSection } from "@/components/layout/UserSection";
 
-export const UserDropDownMenu = () => {
-  const handlelogOut = () => {
+export const UserDropdownMenu = () => {
+  const handlelogout = () => {
     console.log("logout");
   };
 
@@ -30,7 +30,7 @@ export const UserDropDownMenu = () => {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem variant="destructive" onClick={handlelogOut}>
+        <DropdownMenuItem variant="destructive" onClick={handlelogout}>
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
