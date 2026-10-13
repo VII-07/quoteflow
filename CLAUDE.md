@@ -45,7 +45,11 @@ No test framework is set up yet.
 
 ## Theming
 
-Design tokens live in `app/colors.css`. `@theme inline` maps `--color-*` utilities to CSS variables. Brand colors are `--primary: #14b8a6` (teal) and `--secondary: #373737` (dark gray). Light mode (`:root`) defines only primary and secondary, while `.dark` defines the full shadcn token set. Dark mode uses the class-based `@custom-variant dark` in `globals.css`.
+Design tokens live in `app/colors.css`. `@theme inline` maps `--color-*` utilities to CSS variables. Brand colors are `--primary: #168779` (teal) and `--secondary: #373737` (dark gray). Both `:root` (light) and `.dark` define the full shadcn token set. A global `@layer base` rule gives `button:not(:disabled)` a pointer cursor, since Tailwind v4 resets it. Dark mode uses the class-based `@custom-variant dark` in `globals.css`.
+
+## Specification
+
+`docs/SPEC.md` is the source of truth for the domain model, business rules (money, rounding, tax, status lifecycle, dates), conventions and roadmap. Read it before working on quotes, clients or totals, and update its status tags when a decision changes.
 
 ## App structure
 
