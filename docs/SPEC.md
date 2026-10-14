@@ -51,14 +51,14 @@ Field types describe the **API/JSON shape** used in the frontend. The PostgreSQL
 
 ### 4.1 Client
 
-| Field       | Type      | Rule                        | DB            |
-| ----------- | --------- | --------------------------- | ------------- |
-| `id`        | `string`  | UUID, technical key         | `uuid`        |
-| `name`      | `string`  | company or person, required | `text`        |
-| `email`     | `string`  | required, valid email       | `text`        |
-| `phone`     | `string?` | optional                    | `text`        |
-| `address`   | `string?` | optional                    | `text`        |
-| `createdAt` | `string`  | ISO timestamp (UTC)         | `timestamptz` |
+| Field       | Type           | Rule                        | DB            |
+| ----------- | -------------- | --------------------------- | ------------- |
+| `id`        | `string`       | UUID, technical key         | `uuid`        |
+| `name`      | `string`       | company or person, required | `text`        |
+| `email`     | `string`       | required, valid email       | `text`        |
+| `phone`     | `string?`      | optional                    | `text`        |
+| `address`   | `string?`      | optional                    | `text`        |
+| `createdAt` | `IsoTimestamp` | ISO timestamp (UTC)         | `timestamptz` |
 
 ### 4.2 LineItem
 
@@ -72,31 +72,31 @@ Field types describe the **API/JSON shape** used in the frontend. The PostgreSQL
 
 ### 4.3 Quote
 
-A quote is either a **draft** or **issued** (sent, accepted or rejected). This is modelled as a **discriminated union on `status`** (**Proposed**), so an issued quote without stored totals is a compile-time error.
+A quote is either a **draft** or **issued** (sent, accepted, rejected or expired). This is modelled as a **discriminated union on `status`** (**Decided**): `DraftQuote | IssuedQuote`, where the issued statuses are `Exclude<QuoteStatus, "draft">`. An issued quote without stored totals is a compile-time error.
 
 Shared fields:
 
-| Field        | Type          | Rule                                                     | DB             |
-| ------------ | ------------- | -------------------------------------------------------- | -------------- |
-| `id`         | `string`      | UUID, technical key                                      | `uuid`         |
-| `number`     | `string`      | human-readable, unique, e.g. `Q-2026-0042`; never the PK | `text unique`  |
-| `clientId`   | `string`      | references `Client.id`                                   | `uuid` FK      |
-| `status`     | `QuoteStatus` | see 5.5                                                  | `text` + check |
-| `currency`   | `Currency`    | always `"GBP"` for now                                   | `char(3)`      |
-| `taxRateBps` | `number`      | integer basis points: `2000` = 20.00%                    | `integer`      |
-| `items`      | `LineItem[]`  | at least 1 item before sending                           | separate table |
-| `notes`      | `string?`     | payment terms, remarks                                   | `text`         |
-| `issueDate`  | `string`      | **calendar date** `YYYY-MM-DD`                           | `date`         |
-| `validUntil` | `string`      | **calendar date** `YYYY-MM-DD`, ≥ `issueDate`            | `date`         |
-| `createdAt`  | `string`      | ISO timestamp (UTC)                                      | `timestamptz`  |
-| `updatedAt`  | `string`      | ISO timestamp (UTC)                                      | `timestamptz`  |
+| Field        | Type           | Rule                                                     | DB             |
+| ------------ | -------------- | -------------------------------------------------------- | -------------- |
+| `id`         | `string`       | UUID, technical key                                      | `uuid`         |
+| `number`     | `string`       | human-readable, unique, e.g. `Q-2026-0042`; never the PK | `text unique`  |
+| `clientId`   | `string`       | references `Client.id`                                   | `uuid` FK      |
+| `status`     | `QuoteStatus`  | see 5.5                                                  | `text` + check |
+| `currency`   | `Currency`     | stored on every quote; always `"GBP"` for now            | `char(3)`      |
+| `taxRateBps` | `number`       | integer basis points: `2000` = 20.00%                    | `integer`      |
+| `items`      | `LineItem[]`   | at least 1 item before sending                           | separate table |
+| `notes`      | `string?`      | payment terms, remarks                                   | `text`         |
+| `issueDate`  | `CalendarDate` | **calendar date** `YYYY-MM-DD`                           | `date`         |
+| `validUntil` | `CalendarDate` | **calendar date** `YYYY-MM-DD`, ≥ `issueDate`            | `date`         |
+| `createdAt`  | `IsoTimestamp` | ISO timestamp (UTC)                                      | `timestamptz`  |
+| `updatedAt`  | `IsoTimestamp` | ISO timestamp (UTC)                                      | `timestamptz`  |
 
 Status-specific fields:
 
-| Variant | `status`                               | Extra fields                               |
-| ------- | -------------------------------------- | ------------------------------------------ |
-| Draft   | `"draft"`                              | none; totals are **calculated** on the fly |
-| Issued  | `"sent"` / `"accepted"` / `"rejected"` | `totals: QuoteTotals`, **stored** snapshot |
+| Variant | `status`                                             | Extra fields                               |
+| ------- | ---------------------------------------------------- | ------------------------------------------ |
+| Draft   | `"draft"`                                            | none; totals are **calculated** on the fly |
+| Issued  | `"sent"` / `"accepted"` / `"rejected"` / `"expired"` | `totals: QuoteTotals`, **stored** snapshot |
 
 ### 4.4 QuoteTotals
 
@@ -108,13 +108,17 @@ Status-specific fields:
 
 ### 4.5 Enumerations
 
-| Name          | Values                                                                  | Status      |
-| ------------- | ----------------------------------------------------------------------- | ----------- |
-| `QuoteStatus` | `"draft" \| "sent" \| "accepted" \| "rejected"`                         | **Decided** |
-| `Currency`    | `"GBP"`                                                                 | **Decided** |
-| `Unit`        | `"pcs"`, `"sq_m"`, `"m"`, `"kg"`, plus `"hr"` for labour (**Proposed**) | **Decided** |
+| Name          | Values                                                       | Status      |
+| ------------- | ------------------------------------------------------------ | ----------- |
+| `QuoteStatus` | `"draft" \| "sent" \| "accepted" \| "rejected" \| "expired"` | **Decided** |
+| `Currency`    | `"GBP"`                                                      | **Decided** |
+| `Unit`        | `"pcs"`, `"sq_m"`, `"m"`, `"kg"`, `"hr"`, `"day"`            | **Decided** |
 
-Units are defined **once**, as a `const` array. The type is derived from that array, and the UI labels come from a `Record<Unit, string>`. The dropdown, the type and the labels then cannot drift apart.
+**Units** live in `features/quotes/units.ts`. They are defined **once**, as a `const` array (`UNITS`). The `Unit` type is derived from that array, and the UI labels come from `UNIT_LABELS`, checked with `satisfies Record<Unit, string>`. The dropdown, the type and the labels then cannot drift apart. The array order is the dropdown order. `hr` and `day` are both labour units and are never converted into each other.
+
+**Currency** (**Decided**): every quote **stores its own `currency`**, like a receipt that shows the £ sign next to the amount. Only `"GBP"` is supported, and the `Currency` type and the `CURRENCY` default live in `types/common.ts`. Why store it: an amount in cents is meaningless without its currency, and if more currencies are ever added, existing quotes already say what they are, so no backfill migration is needed.
+
+**Date aliases** (`types/common.ts`): `CalendarDate` (`YYYY-MM-DD`) and `IsoTimestamp` (ISO in UTC). Both are plain `string` aliases. They document intent, but TypeScript does not stop one being assigned to the other.
 
 ## 5. Business rules
 
@@ -157,24 +161,35 @@ Implemented as a single **pure function** (`calculateQuoteTotals`) in `features/
 - Dates travel as **strings** because JSON has no date type. Typing them as `Date` would be a lie at runtime.
 - **Moments in time** (`createdAt`, `updatedAt`): ISO timestamp in UTC.
 - **Calendar dates** (`issueDate`, `validUntil`): `YYYY-MM-DD`, with no time and no timezone.
+- In types, use the `CalendarDate` and `IsoTimestamp` aliases instead of a bare `string`.
 
 > ⚠️ `new Date("2026-10-13")` is parsed as midnight **UTC**, so in timezones behind UTC it displays as the previous day. Never convert a calendar date to `Date` just to display it.
 
 ### 5.5 Status lifecycle
 
-| From       | To         | Allowed  | Notes                                      |
-| ---------- | ---------- | -------- | ------------------------------------------ |
-| `draft`    | `sent`     | ✅       | requires ≥ 1 line item; snapshots totals   |
-| `sent`     | `accepted` | ✅       | final                                      |
-| `sent`     | `rejected` | ✅       | final                                      |
-| `sent`     | `draft`    | **Open** | probably via a new version instead (see 7) |
-| `accepted` | any        | ❌       | accepted quotes are immutable              |
-| `rejected` | any        | ❌       | final                                      |
+| From       | To         | Allowed  | Notes                                       |
+| ---------- | ---------- | -------- | ------------------------------------------- |
+| `draft`    | `sent`     | ✅       | requires ≥ 1 line item; snapshots totals    |
+| `sent`     | `accepted` | ✅       | final                                       |
+| `sent`     | `rejected` | ✅       | final                                       |
+| `sent`     | `expired`  | ✅       | **server only**, see 5.7                    |
+| `sent`     | `draft`    | **Open** | probably via a new version instead (see 7)  |
+| `accepted` | any        | ❌       | accepted quotes are immutable; never expire |
+| `rejected` | any        | ❌       | final                                       |
+| `expired`  | any        | **Open** | re-issue probably via a new version (see 7) |
 
 ### 5.6 Editing (**Decided**)
 
 - Only `draft` quotes are editable.
-- `accepted` and `rejected` quotes are read-only.
+- `accepted`, `rejected` and `expired` quotes are read-only.
+
+### 5.7 Expiry (**Decided**: stored status, set on the server)
+
+- `expired` is a **stored** status.
+- A scheduled **server-side job** moves `sent` quotes whose `validUntil` has passed to `expired`.
+- The frontend never computes or writes expiry. The status changes when the quote actually expires, not when someone happens to open it.
+- Only `sent` quotes can expire. `draft`, `accepted` and `rejected` are untouched.
+- Until the backend exists, mocks contain `expired` quotes directly.
 
 ## 6. Frontend architecture
 
@@ -188,10 +203,10 @@ web/
 │   ├── shared/             # reusable non-domain pieces
 │   └── ui/                 # shadcn primitives
 ├── features/
-│   ├── quotes/             # types, calculateQuoteTotals, data access
+│   ├── quotes/             # types, units, calculateQuoteTotals, data access
 │   └── clients/            # types, data access
 ├── lib/                    # app-wide helpers (navigation, utils)
-└── types/                  # shared types (Currency, ...)
+└── types/                  # shared types (Currency, CalendarDate, IsoTimestamp)
 ```
 
 ### 6.2 Data access (**Decided**)
@@ -213,10 +228,10 @@ web/
 
 | Topic              | Question                                                                                                                                |
 | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Expiry             | Store `expired` as a status, or derive it from `validUntil` at read time? State that depends on "now" can't update itself in the DB.    |
 | Client snapshot    | If a client's address changes after a quote is sent, the sent quote should still show the old address. Snapshot client details on send? |
 | Versioning         | How is a sent quote changed: a new `QuoteVersion` row with `version: number`, previous versions immutable?                              |
 | Quantity precision | Confirm the 3-decimal limit and where it's validated (form, API, DB).                                                                   |
+| Expiry job         | How often does the expiry job run, and in which timezone is "past `validUntil`" evaluated? (UK: Europe/London)                          |
 | Quote numbering    | Who generates `Q-YYYY-NNNN`, and how are duplicates under concurrency avoided? (backend, inside a transaction)                          |
 
 ## 8. Edge cases checklist (mocks and tests)
@@ -239,6 +254,6 @@ web/
 | 2    | Mobile navigation (Sheet)                                            | Done        |
 | 3    | User menu (DropdownMenu)                                             | Done        |
 | 4    | Footer, sticky layout, `Container`                                   | Done        |
-| 5    | Types + `calculateQuoteTotals` + mock data layer                     | In progress |
+| 5    | Types ✅ + `calculateQuoteTotals` + mock data layer                  | In progress |
 | 6    | Pages on mock data: dashboard, quotes (list / new / detail), clients | Next        |
 | 7    | Backend: Express + PostgreSQL, transactions, validation, versioning  | Later       |
