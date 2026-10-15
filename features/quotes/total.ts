@@ -1,0 +1,35 @@
+import { type LineItem, type QuoteTotals } from "@/features/quotes/types";
+
+export const calculateLineTotal = (
+  quantity: number,
+  unitPriceCents: number,
+): number => {
+  const quantityThousandths = Math.round(quantity * 1000);
+  const exactCents = (quantityThousandths * unitPriceCents) / 1000;
+
+  return Math.round(exactCents);
+};
+
+export const calculateTaxCents = (
+  subtotalCents: number,
+  taxRateBps: number,
+): number => {
+  return Math.round((subtotalCents * taxRateBps) / 10_000);
+};
+
+export const calculateQuoteTotals = (
+  items: LineItem[],
+  taxRateBps: number,
+): QuoteTotals => {
+  const subtotalCents = items.reduce(
+    (sum, item) => sum + calculateLineTotal(item.quantity, item.unitPriceCents),
+    0,
+  );
+  const taxCents: number = calculateTaxCents(subtotalCents, taxRateBps);
+
+  return {
+    subtotalCents,
+    taxCents,
+    totalCents: subtotalCents + taxCents,
+  };
+};

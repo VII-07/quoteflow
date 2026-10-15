@@ -130,14 +130,19 @@ Status-specific fields:
 
 ### 5.2 Calculation and rounding (**Decided**: Half-Up, **per line**)
 
-1. `lineTotal = round(quantity × unitPriceCents)` for **each line**.
+1. `lineTotal` for **each line**, using integer arithmetic:
+   1. `quantityThousandths = round(quantity × 1000)`. This turns the ≤ 3-decimal quantity into an exact integer and removes float noise such as `284.9999…`.
+   2. `exact = quantityThousandths × unitPriceCents / 1000`. Integer × integer is exact, so a true half lands exactly on `.5`.
+   3. `lineTotal = round(exact)`. This is the business Half-Up rounding to whole pence.
 2. `subtotal = Σ lineTotal`.
 3. `tax = round(subtotal × taxRateBps / 10 000)`, calculated **once**, on the subtotal.
 4. `total = subtotal + tax`.
 
 Rounding is **Half-Up**. Invariant: the sum of the displayed line totals always equals the displayed subtotal.
 
-Implemented as a single **pure function** (`calculateQuoteTotals`) in `features/quotes/`, with no React and no I/O, so it can be unit-tested.
+Implemented as **pure functions** in `features/quotes/total.ts` (`calculateLineTotal`, `calculateTaxCents`, `calculateQuoteTotals`), with no React and no I/O, so they can be unit-tested.
+
+> Why not `round(quantity × unitPriceCents)` directly: `0.285 × 100` evaluates to `28.499999999999996` in JavaScript, so `Math.round` returns 28 instead of 29. Scaling the quantity to integer thousandths first avoids this.
 
 > ⚠️ `Math.round` is Half-Up only for non-negative numbers (`Math.round(-2.5) === -2`). That's fine while negative lines are out of scope, but revisit it if discounts are added.
 

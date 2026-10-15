@@ -1,5 +1,7 @@
 {
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "javascript.preferences.importModuleSpecifier": "non-relative"
 }
