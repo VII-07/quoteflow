@@ -217,7 +217,9 @@ web/
 ### 6.2 Data access (**Decided**)
 
 - Pages and components never import mock arrays directly.
-- They call async functions such as `getQuotes(): Promise<Quote[]>`, which return mocks for now and will call the API later. Only these functions change when the backend arrives.
+- They call async functions in `features/*/data.ts` (`getQuotes`, `getQuoteById`, `getClients`, `getClientById`), which return mocks for now and will call the API later. Only these functions change when the backend arrives.
+- Only `data.ts` imports `mocks.ts`. Data functions return a **deep copy** (`structuredClone`), so callers can't mutate the mock store.
+- `get…ById` returns `null` when nothing is found. The page decides what to show (`notFound()` → 404).
 - Pages are **Server Components** that `await` data. No `useEffect` fetching.
 
 ### 6.3 Conventions
@@ -259,6 +261,6 @@ web/
 | 2    | Mobile navigation (Sheet)                                            | Done        |
 | 3    | User menu (DropdownMenu)                                             | Done        |
 | 4    | Footer, sticky layout, `Container`                                   | Done        |
-| 5    | Types ✅ + `calculateQuoteTotals` + mock data layer                  | In progress |
-| 6    | Pages on mock data: dashboard, quotes (list / new / detail), clients | Next        |
+| 5    | Types, `calculateQuoteTotals` + Vitest tests, mock data layer        | Done        |
+| 6    | Pages on mock data: dashboard, quotes (list / new / detail), clients | In progress |
 | 7    | Backend: Express + PostgreSQL, transactions, validation, versioning  | Later       |
