@@ -1,8 +1,10 @@
-export const formatMoney = (moneyPence: number): string => {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "EUR",
-  }).format(moneyPence);
-};
+import { CURRENCY } from "@/types/common";
 
-console.log(formatMoney(9598 / 100));
+const currencyFormatter = new Intl.NumberFormat("en-GB", {
+  style: "currency",
+  currency: CURRENCY,
+});
+
+export const formatMoney = (moneyPence: number): string => {
+  return currencyFormatter.format(moneyPence / 100);
+};
