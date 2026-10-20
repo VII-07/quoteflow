@@ -3,8 +3,13 @@ import {
   calculateLineTotal,
   calculateQuoteTotals,
   calculateTaxCents,
+  getDisplayTotals,
 } from "@/features/quotes/total";
-import { type LineItem } from "@/features/quotes/types";
+import {
+  type DraftQuote,
+  type IssuedQuote,
+  type LineItem,
+} from "@/features/quotes/types";
 
 const makeItem = (
   quantity: number,
@@ -161,4 +166,49 @@ describe("calculateQuoteTotals", () => {
   ])("$scenario", ({ items, taxRateBps, expected }) => {
     expect(calculateQuoteTotals(items, taxRateBps)).toEqual(expected);
   });
+});
+
+describe("getDisplayTotals", () => {
+  const baseQuote: Omit<DraftQuote, "status"> = {
+    id: "test-quote-id",
+    number: "Q-2026-0001",
+    clientId: "test-client-id",
+    taxRateBps: 2000,
+    items: [makeItem(2.5, 1999), makeItem(3, 1000)],
+    issueDate: "2026-10-01",
+    validUntil: "2026-10-31",
+    currency: "GBP",
+    createdAt: "2026-10-01T09:00:00.000Z",
+    updatedAt: "2026-10-01T09:00:00.000Z",
+  };
+
+  it("calculates totals from line items for a draft", () => {
+    const draft: DraftQuote = { ...baseQuote, status: "draft" };
+
+    expect(getDisplayTotals(draft)).toEqual({
+      subtotalCents: 7998,
+      taxCents: 1600,
+      totalCents: 9598,
+    });
+  });
+
+  it.each(["sent", "accepted", "rejected", "expired"] as const)(
+    "returns the stored snapshot for a %s quote, not a recalculation",
+    (status) => {
+      // Deliberately different from what the items would produce,
+      // so the test fails if the function recalculates.
+      const storedTotals = {
+        subtotalCents: 1,
+        taxCents: 2,
+        totalCents: 3,
+      };
+      const issued: IssuedQuote = {
+        ...baseQuote,
+        status,
+        totals: storedTotals,
+      };
+
+      expect(getDisplayTotals(issued)).toEqual(storedTotals);
+    },
+  );
 });

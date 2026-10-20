@@ -1,4 +1,8 @@
-import { type LineItem, type QuoteTotals } from "@/features/quotes/types";
+import {
+  type LineItem,
+  type QuoteTotals,
+  type Quote,
+} from "@/features/quotes/types";
 
 export const calculateLineTotal = (
   quantity: number,
@@ -32,4 +36,11 @@ export const calculateQuoteTotals = (
     taxCents,
     totalCents: subtotalCents + taxCents,
   };
+};
+
+export const getDisplayTotals = (quote: Quote): QuoteTotals => {
+  if (quote.status === "draft")
+    return calculateQuoteTotals(quote.items, quote.taxRateBps);
+
+  return quote.totals;
 };

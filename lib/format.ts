@@ -15,7 +15,7 @@ export const formatMoney = (moneyPence: number): CalendarDate => {
   return currencyFormatter.format(moneyPence / 100);
 };
 
-export const formatCalendarDate = (date: string): string => {
+export const formatCalendarDate = (date: CalendarDate): string => {
   const [year, month, day] = date.split("-");
   const utcDate = new Date(
     Date.UTC(Number(year), Number(month) - 1, Number(day)),
