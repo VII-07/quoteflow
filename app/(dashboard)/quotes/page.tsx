@@ -2,6 +2,7 @@ import { getClients } from "@/features/clients/data";
 import { getQuotes } from "@/features/quotes/data";
 import { getDisplayTotals } from "@/features/quotes/total";
 import { formatCalendarDate, formatMoney } from "@/lib/format";
+import Link from "next/link";
 
 const QuotesPage = async () => {
   const [quotes, clients] = await Promise.all([getQuotes(), getClients()]);
@@ -9,7 +10,7 @@ const QuotesPage = async () => {
 
   return (
     <div>
-      <h1>Quotes Page</h1>
+      <h1>Quotes</h1>
 
       {quotes.length !== 0 ? (
         <table className="border">
@@ -27,7 +28,10 @@ const QuotesPage = async () => {
             {quotes.map((quote) => {
               return (
                 <tr key={quote.id} className="border">
-                  <td className="border">{quote.number}</td>
+                  <td className="border">
+                    <Link href={`/quotes/${quote.id}`}>{quote.number}</Link>
+                  </td>
+
                   <td className="border">
                     {clientNameById.get(quote.clientId) ?? "Unknown client"}
                   </td>

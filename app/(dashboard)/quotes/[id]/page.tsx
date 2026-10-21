@@ -1,9 +1,12 @@
-const Quote = () => {
+import { QuoteDetails } from "@/app/(dashboard)/quotes/[id]/QuoteDetails";
+import { Suspense } from "react";
+
+const QuoteDetailsPage = ({ params }: PageProps<"/quotes/[id]">) => {
   return (
-    <div>
-      <h1>Quote</h1>
-    </div>
+    <Suspense fallback={<p>Loading quote…</p>}>
+      <QuoteDetails params={params} />
+    </Suspense>
   );
 };
 
-export default Quote;
+export default QuoteDetailsPage;
