@@ -114,7 +114,7 @@ Status-specific fields:
 | `Currency`    | `"GBP"`                                                      | **Decided** |
 | `Unit`        | `"pcs"`, `"sq_m"`, `"m"`, `"kg"`, `"hr"`, `"day"`            | **Decided** |
 
-**Units** live in `features/quotes/units.ts`. They are defined **once**, as a `const` array (`UNITS`). The `Unit` type is derived from that array, and the UI labels come from `UNIT_LABELS`, checked with `satisfies Record<Unit, string>`. The dropdown, the type and the labels then cannot drift apart. The array order is the dropdown order. `hr` and `day` are both labour units and are never converted into each other.
+**Units** live in `features/quotes/units.ts`. They are defined **once**, as a `const` array (`UNITS`). The `Unit` type is derived from that array, and the UI labels come from `UNIT_LABELS` (long, for dropdowns) and `UNIT_SHORT_LABELS` (compact, for tables), both checked with `satisfies Record<Unit, string>`. The dropdown, the type and the labels then cannot drift apart. The array order is the dropdown order. `hr` and `day` are both labour units and are never converted into each other.
 
 **Currency** (**Decided**): every quote **stores its own `currency`**, like a receipt that shows the £ sign next to the amount. Only `"GBP"` is supported, and the `Currency` type and the `CURRENCY` default live in `types/common.ts`. Why store it: an amount in cents is meaningless without its currency, and if more currencies are ever added, existing quotes already say what they are, so no backfill migration is needed.
 
@@ -159,7 +159,10 @@ Implemented as **pure functions** in `features/quotes/total.ts` (`calculateLineT
 ### 5.3 Totals: calculate or store (**Decided**: snapshot)
 
 - **Draft:** totals are calculated from the line items on every change and are **not stored**.
-- **On send:** totals are calculated once and **stored as a snapshot**. From then on the stored values are the source of truth, even if the rounding logic or tax rules change later.
+- **On send:** every line total (`lineTotalCents`) and the quote totals are calculated once and **stored as a snapshot**. From then on the stored values are the source of truth, even if the rounding logic or tax rules change later.
+- Line totals are part of the snapshot, not only the quote totals. If only the totals were stored and line totals were recalculated on display, a later rounding change would make the shown lines stop adding up to the stored subtotal (breaking the 5.2 invariant).
+- Types enforce it: `IssuedQuote.items` is `PricedLineItem[]` (a `LineItem` plus `lineTotalCents`), so an issued quote without stored line totals is a compile-time error.
+- Display goes through `getDisplayItems` and `getDisplayTotals` (`features/quotes/total.ts`): drafts calculate, issued quotes return the snapshot. Components never decide this themselves.
 
 ### 5.4 Dates (**Decided**)
 
@@ -209,6 +212,7 @@ web/
 │   └── ui/                 # shadcn primitives
 ├── features/
 │   ├── quotes/             # types, units, calculateQuoteTotals, data access
+│   │   └── components/     # quote UI used by several routes (tables, status badge)
 │   └── clients/            # types, data access
 ├── lib/                    # app-wide helpers (navigation, utils)
 └── types/                  # shared types (Currency, CalendarDate, IsoTimestamp)

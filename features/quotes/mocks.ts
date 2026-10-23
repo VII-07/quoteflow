@@ -1,7 +1,11 @@
-import { calculateQuoteTotals } from "@/features/quotes/total";
+import {
+  calculateLineTotal,
+  calculateQuoteTotals,
+} from "@/features/quotes/total";
 import {
   type DraftQuote,
   type IssuedQuote,
+  type LineItem,
   type Quote,
 } from "@/features/quotes/types";
 import { CURRENCY } from "@/types/common";
@@ -15,11 +19,18 @@ const CLIENT_SMITH = "c0000000-0000-4000-8000-000000000002";
 const CLIENT_LONG_NAME = "c0000000-0000-4000-8000-000000000003";
 const CLIENT_JANE = "c0000000-0000-4000-8000-000000000004";
 
-// Mirrors what the server will do on "send": totals are calculated once and
-// stored as a snapshot (SPEC 5.3). Computing them here instead of hardcoding
-// numbers means the mock totals can never drift from the line items.
-const issue = (quote: Omit<IssuedQuote, "totals">): IssuedQuote => ({
+// Mirrors what the server will do on "send": line totals and quote totals are
+// calculated once and stored as a snapshot (SPEC 5.3). Computing them here
+// instead of hardcoding numbers means the mock snapshot can never drift from
+// the line items.
+const issue = (
+  quote: Omit<IssuedQuote, "totals" | "items"> & { items: LineItem[] },
+): IssuedQuote => ({
   ...quote,
+  items: quote.items.map((item) => ({
+    ...item,
+    lineTotalCents: calculateLineTotal(item.quantity, item.unitPriceCents),
+  })),
   totals: calculateQuoteTotals(quote.items, quote.taxRateBps),
 });
 

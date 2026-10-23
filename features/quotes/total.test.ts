@@ -3,6 +3,7 @@ import {
   calculateLineTotal,
   calculateQuoteTotals,
   calculateTaxCents,
+  getDisplayItems,
   getDisplayTotals,
 } from "@/features/quotes/total";
 import {
@@ -205,10 +206,64 @@ describe("getDisplayTotals", () => {
       const issued: IssuedQuote = {
         ...baseQuote,
         status,
+        items: baseQuote.items.map((item) => ({ ...item, lineTotalCents: 0 })),
         totals: storedTotals,
       };
 
       expect(getDisplayTotals(issued)).toEqual(storedTotals);
+    },
+  );
+});
+
+describe("getDisplayItems", () => {
+  const baseQuote: Omit<DraftQuote, "status"> = {
+    id: "test-quote-id",
+    number: "Q-2026-0001",
+    clientId: "test-client-id",
+    taxRateBps: 2000,
+    items: [makeItem(2.5, 1999), makeItem(3, 1000)],
+    issueDate: "2026-10-01",
+    validUntil: "2026-10-31",
+    currency: "GBP",
+    createdAt: "2026-10-01T09:00:00.000Z",
+    updatedAt: "2026-10-01T09:00:00.000Z",
+  };
+
+  it("adds calculated line totals to draft items", () => {
+    const draft: DraftQuote = { ...baseQuote, status: "draft" };
+
+    expect(getDisplayItems(draft).map((item) => item.lineTotalCents)).toEqual([
+      4998, 3000,
+    ]);
+  });
+
+  it("keeps the other item fields of a draft unchanged", () => {
+    const draft: DraftQuote = { ...baseQuote, status: "draft" };
+
+    expect(getDisplayItems(draft)[0]).toMatchObject(baseQuote.items[0]);
+  });
+
+  it("returns an empty list for a draft with no items", () => {
+    const draft: DraftQuote = { ...baseQuote, status: "draft", items: [] };
+
+    expect(getDisplayItems(draft)).toEqual([]);
+  });
+
+  it.each(["sent", "accepted", "rejected", "expired"] as const)(
+    "returns the stored line totals for a %s quote, not a recalculation",
+    (status) => {
+      // Deliberately different from what quantity × price would produce,
+      // so the test fails if the function recalculates.
+      const issued: IssuedQuote = {
+        ...baseQuote,
+        status,
+        items: baseQuote.items.map((item) => ({ ...item, lineTotalCents: 1 })),
+        totals: { subtotalCents: 2, taxCents: 0, totalCents: 2 },
+      };
+
+      expect(
+        getDisplayItems(issued).map((item) => item.lineTotalCents),
+      ).toEqual([1, 1]);
     },
   );
 });

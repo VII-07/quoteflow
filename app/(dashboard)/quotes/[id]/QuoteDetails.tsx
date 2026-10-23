@@ -1,9 +1,12 @@
-import { getClientById } from "@/features/clients/data";
-import { getQuoteById } from "@/features/quotes/data";
-import { calculateLineTotal, getDisplayTotals } from "@/features/quotes/total";
-import { UNIT_LABELS } from "@/features/quotes/units";
-import { formatCalendarDate, formatMoney } from "@/lib/format";
 import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getClientById } from "@/features/clients/data";
+import { LineItemsTable } from "@/features/quotes/components/LineItemsTable";
+import { QuoteStatusBadge } from "@/features/quotes/components/QuoteStatusBadge";
+import { QuoteTotalsSummary } from "@/features/quotes/components/QuoteTotalsSummary";
+import { getQuoteById } from "@/features/quotes/data";
+import { getDisplayItems, getDisplayTotals } from "@/features/quotes/total";
+import { formatCalendarDate } from "@/lib/format";
 
 export const QuoteDetails = async ({
   params,
@@ -16,103 +19,79 @@ export const QuoteDetails = async ({
   }
 
   const client = await getClientById(quote.clientId);
-
+  const items = getDisplayItems(quote);
   const totals = getDisplayTotals(quote);
 
   return (
-    <div className="space-y-8">
-      <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
-          <div>
-            <h1 className="text-2xl font-bold">{quote.number}</h1>
-            <p className="text-muted-foreground">
-              Client:{" "}
-              <span className="font-medium text-foreground">
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="space-y-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  {quote.number}
+                </h1>
+                <QuoteStatusBadge status={quote.status} />
+              </div>
+              <p className="mt-1 break-words text-muted-foreground">
                 {client?.name ?? "Unknown client"}
-              </span>
-            </p>
+              </p>
+            </div>
           </div>
-          <div className="rounded-full bg-secondary px-3 py-1 text-sm font-semibold text-secondary-foreground capitalize">
-            {quote.status}
-          </div>
-        </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <p className="text-muted-foreground">Issue Date</p>
-            <p className="font-medium">{formatCalendarDate(quote.issueDate)}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Valid Until</p>
-            <p className="font-medium">
-              {formatCalendarDate(quote.validUntil)}
-            </p>
-          </div>
-        </div>
+          <dl className="grid grid-cols-2 gap-4 border-t pt-4 text-sm sm:grid-cols-4">
+            <div>
+              <dt className="text-muted-foreground">Issued</dt>
+              <dd className="mt-0.5 font-medium">
+                {formatCalendarDate(quote.issueDate)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-muted-foreground">Valid until</dt>
+              <dd className="mt-0.5 font-medium">
+                {formatCalendarDate(quote.validUntil)}
+              </dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
+
+      <Card className="pb-0">
+        <CardHeader>
+          <CardTitle>
+            <h2>Line items</h2>
+          </CardTitle>
+        </CardHeader>
+        <LineItemsTable items={items} />
+      </Card>
+
+      <div className="grid gap-6 md:grid-cols-[1fr_20rem] md:items-start">
+        {quote.notes ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                <h2>Notes</h2>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="whitespace-pre-wrap text-muted-foreground">
+                {quote.notes}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          // Keeps the totals card in the right column when there are no notes.
+          <div className="hidden md:block" />
+        )}
+
+        {/* Totals matter most, so on phones they come before the notes. */}
+        <Card className="order-first md:order-none">
+          <CardContent>
+            <QuoteTotalsSummary totals={totals} taxRateBps={quote.taxRateBps} />
+          </CardContent>
+        </Card>
       </div>
-
-      <div className="overflow-x-auto rounded-lg border bg-card shadow-sm">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b bg-muted/50 text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 font-medium">Description</th>
-              <th className="px-4 py-3 text-right font-medium">Qty</th>
-              <th className="px-4 py-3 font-medium">Unit</th>
-              <th className="px-4 py-3 text-right font-medium">Unit Price</th>
-              <th className="px-4 py-3 text-right font-medium">Line Total</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {quote.items.map((item) => (
-              <tr key={item.id} className="hover:bg-muted/20">
-                <td className="px-4 py-3 font-medium">{item.description}</td>
-                <td className="px-4 py-3 text-right">{item.quantity}</td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  {UNIT_LABELS[item.unit]}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {formatMoney(item.unitPriceCents)}
-                </td>
-                <td className="px-4 py-3 text-right font-semibold">
-                  {formatMoney(
-                    calculateLineTotal(item.quantity, item.unitPriceCents),
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="flex justify-end">
-        <div className="w-full max-w-xs space-y-2 rounded-lg border bg-card p-4 text-sm shadow-sm">
-          <div className="flex justify-between text-muted-foreground">
-            <span>Subtotal</span>
-            <span className="font-medium text-foreground">
-              {formatMoney(totals.subtotalCents)}
-            </span>
-          </div>
-          <div className="flex justify-between text-muted-foreground">
-            <span>VAT ({quote.taxRateBps / 100}%)</span>
-            <span className="font-medium text-foreground">
-              {formatMoney(totals.taxCents)}
-            </span>
-          </div>
-          <div className="flex justify-between border-t pt-2 text-base font-bold text-foreground">
-            <span>Total</span>
-            <span>{formatMoney(totals.totalCents)}</span>
-          </div>
-        </div>
-      </div>
-
-      {quote.notes && (
-        <div className="rounded-lg border bg-muted/30 p-4 text-sm">
-          <h2 className="font-semibold text-foreground">Notes</h2>
-          <p className="mt-1 whitespace-pre-wrap text-muted-foreground">
-            {quote.notes}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

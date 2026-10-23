@@ -2,6 +2,7 @@ import {
   type LineItem,
   type QuoteTotals,
   type Quote,
+  type PricedLineItem,
 } from "@/features/quotes/types";
 
 export const calculateLineTotal = (
@@ -43,4 +44,15 @@ export const getDisplayTotals = (quote: Quote): QuoteTotals => {
     return calculateQuoteTotals(quote.items, quote.taxRateBps);
 
   return quote.totals;
+};
+
+export const getDisplayItems = (quote: Quote): PricedLineItem[] => {
+  if (quote.status === "draft") {
+    return quote.items.map((item) => ({
+      ...item,
+      lineTotalCents: calculateLineTotal(item.quantity, item.unitPriceCents),
+    }));
+  }
+
+  return quote.items;
 };

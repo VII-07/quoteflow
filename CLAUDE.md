@@ -32,8 +32,7 @@ Run everything from `web/`:
 - `npm run lint` runs ESLint 9 flat config (`eslint.config.mjs`, next core-web-vitals + typescript)
 - `npx tsc --noEmit` type-checks without building
 - `npm run format` / `npm run format:check` runs Prettier with `prettier-plugin-tailwindcss`, which sorts classes. `.prettierrc` points the plugin at `app/globals.css` because Tailwind v4 has no JS config.
-
-No test framework is set up yet.
+- `npm test` runs Vitest in watch mode; `npx vitest run` runs once. Tests sit next to the code (`*.test.ts`).
 
 ## Stack
 

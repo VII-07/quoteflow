@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { MOCK_CLIENTS } from "@/features/clients/mocks";
 import { MOCK_QUOTES } from "@/features/quotes/mocks";
-import { calculateQuoteTotals } from "@/features/quotes/total";
+import {
+  calculateLineTotal,
+  calculateQuoteTotals,
+} from "@/features/quotes/total";
 import { type QuoteStatus } from "@/features/quotes/types";
 
 // Integrity checks for the mock data itself: bad test data hides real bugs.
@@ -50,6 +53,32 @@ describe("mock data integrity", () => {
       expect(quote.totals, quote.number).toEqual(
         calculateQuoteTotals(quote.items, quote.taxRateBps),
       );
+    }
+  });
+
+  it("stores line totals on issued quotes that match their line items", () => {
+    for (const quote of MOCK_QUOTES) {
+      if (quote.status === "draft") continue;
+
+      for (const item of quote.items) {
+        expect(
+          item.lineTotalCents,
+          `${quote.number} / ${item.description}`,
+        ).toBe(calculateLineTotal(item.quantity, item.unitPriceCents));
+      }
+    }
+  });
+
+  it("stores line totals that add up to the stored subtotal", () => {
+    for (const quote of MOCK_QUOTES) {
+      if (quote.status === "draft") continue;
+
+      const lineTotalsSum = quote.items.reduce(
+        (sum, item) => sum + item.lineTotalCents,
+        0,
+      );
+
+      expect(lineTotalsSum, quote.number).toBe(quote.totals.subtotalCents);
     }
   });
 
